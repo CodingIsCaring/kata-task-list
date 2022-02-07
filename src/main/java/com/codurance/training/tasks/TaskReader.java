@@ -1,14 +1,13 @@
 package com.codurance.training.tasks;
 
-import java.io.BufferedReader;
-import java.io.IOException;
+import java.io.*;
 
 public class TaskReader {
 
     private BufferedReader reader;
 
-    public TaskReader(BufferedReader reader) {
-        this.reader = reader;
+    public TaskReader(PipedInputStream inputStream) {
+        this.reader = new BufferedReader(new InputStreamReader(inputStream));
     }
 
     public String readLine() throws IOException {

@@ -1,9 +1,6 @@
 package com.codurance.training.tasks;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,8 +16,7 @@ public final class TaskList implements Runnable {
     private long lastId = 0;
 
     public static void main(String[] args) {
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        TaskReader reader = new TaskReader(in);
+        TaskReader reader = new TaskReader((PipedInputStream) System.in);
         PrintWriter out = new PrintWriter(System.out);
         new TaskList(reader, out).run();
     }
