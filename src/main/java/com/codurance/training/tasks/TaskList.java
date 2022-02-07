@@ -13,20 +13,21 @@ public final class TaskList implements Runnable {
     private static final String QUIT = "quit";
 
     private final Map<String, List<Task>> tasks = new LinkedHashMap<>();
-    private final BufferedReader in;
+    private TaskReader taskReader;
     private final PrintWriter out;
 
     private long lastId = 0;
 
     public static void main(String[] args) {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+        TaskReader reader = new TaskReader(in);
         PrintWriter out = new PrintWriter(System.out);
-        new TaskList(in, out).run();
+        new TaskList(reader, out).run();
     }
 
-    public TaskList(BufferedReader reader, PrintWriter writer) {
-        this.in = reader;
-        this.out = writer;
+    public TaskList(TaskReader taskReader, PrintWriter out) {
+        this.taskReader = taskReader;
+        this.out = out;
     }
 
     public void run() {
@@ -35,7 +36,7 @@ public final class TaskList implements Runnable {
             out.flush();
             String command;
             try {
-                command = in.readLine();
+                command = taskReader.readLine();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
