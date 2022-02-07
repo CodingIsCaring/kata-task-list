@@ -14,4 +14,8 @@ public class TaskReader {
         return reader.readLine();
     }
 
+    public void read(char[] buffer, int offset, int length) throws IOException {
+        reader.read(buffer, offset, length);
+    }
+
 }
