@@ -14,28 +14,28 @@ import static org.hamcrest.Matchers.is;
 
 public final class ApplicationTest {
     public static final String PROMPT = "> ";
-    private final PipedOutputStream inStream = new PipedOutputStream();
-    private final TaskPrinter inWriter = new TaskPrinter(inStream, true);
+    private final PipedOutputStream outputStream = new PipedOutputStream();
+    private final TaskPrinter printer = new TaskPrinter(outputStream, true);
 
-    private final PipedInputStream outStream = new PipedInputStream();
-    private final TaskReader taskReader = new TaskReader(outStream);
+    private final PipedInputStream inputStream = new PipedInputStream();
+    private final TaskReader reader = new TaskReader(inputStream);
 
     private Thread applicationThread;
 
     public ApplicationTest() throws IOException {
-        TaskReader reader = new TaskReader(new PipedInputStream(inStream));
-        TaskPrinter out = new TaskPrinter(outStream);
-        TaskList taskList = new TaskList(reader, out);
+        TaskReader taskReader = new TaskReader(new PipedInputStream(outputStream));
+        TaskPrinter taskPrinter = new TaskPrinter(inputStream);
+        TaskList taskList = new TaskList(taskReader, taskPrinter);
         applicationThread = new Thread(taskList);
     }
 
-    @Before public void
-    start_the_application() {
+    @Before
+    public void start_the_application() {
         applicationThread.start();
     }
 
-    @After public void
-    kill_the_application() throws IOException, InterruptedException {
+    @After
+    public void kill_the_application() throws InterruptedException {
         if (!stillRunning()) {
             return;
         }
@@ -49,8 +49,8 @@ public final class ApplicationTest {
         throw new IllegalStateException("The application is still running.");
     }
 
-    @Test(timeout = 1000) public void
-    it_works() throws IOException {
+    @Test(timeout = 1000)
+    public void it_works() throws IOException {
         execute("show");
 
         execute("add project secrets");
@@ -59,10 +59,10 @@ public final class ApplicationTest {
 
         execute("show");
         readLines(
-            "secrets",
-            "    [ ] 1: Eat more donuts.",
-            "    [ ] 2: Destroy all humans.",
-            ""
+                "secrets",
+                "    [ ] 1: Eat more donuts.",
+                "    [ ] 2: Destroy all humans.",
+                ""
         );
 
         execute("add project training");
@@ -99,13 +99,13 @@ public final class ApplicationTest {
 
     private void execute(String command) throws IOException {
         read(PROMPT);
-        write(command);
+        printer.println(command);
     }
 
     private void read(String expectedOutput) throws IOException {
         int length = expectedOutput.length();
         char[] buffer = new char[length];
-        taskReader.read(buffer, 0, length);
+        reader.read(buffer, 0, length);
 
         assertThat(String.valueOf(buffer), is(expectedOutput));
     }
@@ -114,10 +114,6 @@ public final class ApplicationTest {
         for (String line : expectedOutput) {
             read(line + lineSeparator());
         }
-    }
-
-    private void write(String input) {
-        inWriter.println(input);
     }
 
     private boolean stillRunning() {
