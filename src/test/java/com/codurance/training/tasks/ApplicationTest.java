@@ -20,7 +20,7 @@ public final class ApplicationTest {
     private final PrintWriter inWriter = new PrintWriter(inStream, true);
 
     private final PipedInputStream outStream = new PipedInputStream();
-    private final BufferedReader outReader = new BufferedReader(new InputStreamReader(outStream));
+    private final TaskReader taskReader = new TaskReader(outStream);
 
     private Thread applicationThread;
 
@@ -107,7 +107,8 @@ public final class ApplicationTest {
     private void read(String expectedOutput) throws IOException {
         int length = expectedOutput.length();
         char[] buffer = new char[length];
-        outReader.read(buffer, 0, length);
+        taskReader.read(buffer, 0, length);
+
         assertThat(String.valueOf(buffer), is(expectedOutput));
     }
 
