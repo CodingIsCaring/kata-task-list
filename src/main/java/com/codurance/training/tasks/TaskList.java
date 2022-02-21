@@ -11,19 +11,19 @@ public final class TaskList implements Runnable {
 
     private final Map<String, List<Task>> tasks = new LinkedHashMap<>();
     private TaskReader taskReader;
-    private final PrintWriter out;
+    private TaskPrinter out;
 
     private long lastId = 0;
 
     public static void main(String[] args) {
         TaskReader reader = new TaskReader((PipedInputStream) System.in);
-        PrintWriter out = new PrintWriter(System.out);
-        new TaskList(reader, out).run();
+        TaskPrinter printer = new TaskPrinter(new PrintWriter(System.out));
+        new TaskList(reader, printer).run();
     }
 
-    public TaskList(TaskReader taskReader, PrintWriter out) {
+    public TaskList(TaskReader taskReader, TaskPrinter taskPrinter) {
         this.taskReader = taskReader;
-        this.out = out;
+        this.out = taskPrinter;
     }
 
     public void run() {

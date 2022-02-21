@@ -1,17 +1,21 @@
 package com.codurance.training.tasks;
 
-import java.io.PrintWriter;
+import java.io.*;
 
 public class TaskPrinter {
 
     private PrintWriter printer;
 
-    public TaskPrinter() {
-        this.printer = new PrintWriter(System.out);
+    public TaskPrinter(PipedOutputStream insStream, Boolean autoFlush) {
+        this.printer = new PrintWriter(insStream, autoFlush);
     }
 
-    public TaskPrinter(Boolean autoFlush) {
-        this.printer = new PrintWriter(System.out, autoFlush);
+    public TaskPrinter(PipedInputStream out) throws IOException {
+        this.printer = new PrintWriter(new PipedOutputStream(out), true);
+
+    }
+    public TaskPrinter(PrintWriter out) {
+        this.printer = out;
     }
 
     public void print(String task) {

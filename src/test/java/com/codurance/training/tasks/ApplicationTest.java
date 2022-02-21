@@ -1,14 +1,12 @@
 package com.codurance.training.tasks;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintWriter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 
 import static java.lang.System.lineSeparator;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -17,7 +15,7 @@ import static org.hamcrest.Matchers.is;
 public final class ApplicationTest {
     public static final String PROMPT = "> ";
     private final PipedOutputStream inStream = new PipedOutputStream();
-    private final PrintWriter inWriter = new PrintWriter(inStream, true);
+    private final TaskPrinter inWriter = new TaskPrinter(inStream, true);
 
     private final PipedInputStream outStream = new PipedInputStream();
     private final TaskReader taskReader = new TaskReader(outStream);
@@ -26,7 +24,7 @@ public final class ApplicationTest {
 
     public ApplicationTest() throws IOException {
         TaskReader reader = new TaskReader(new PipedInputStream(inStream));
-        PrintWriter out = new PrintWriter(new PipedOutputStream(outStream), true);
+        TaskPrinter out = new TaskPrinter(outStream);
         TaskList taskList = new TaskList(reader, out);
         applicationThread = new Thread(taskList);
     }
