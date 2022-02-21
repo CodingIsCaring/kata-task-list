@@ -6,16 +6,16 @@ public class TaskPrinter {
 
     private PrintWriter printer;
 
-    public TaskPrinter(PipedOutputStream insStream, Boolean autoFlush) {
-        this.printer = new PrintWriter(insStream, autoFlush);
+    public TaskPrinter(PipedOutputStream outputStream, Boolean autoFlush) {
+        this.printer = new PrintWriter(outputStream, autoFlush);
     }
 
-    public TaskPrinter(PipedInputStream out) throws IOException {
-        this.printer = new PrintWriter(new PipedOutputStream(out), true);
-
+    public TaskPrinter(PipedInputStream inputStream) throws IOException {
+        this.printer = new PrintWriter(new PipedOutputStream(inputStream), true);
     }
-    public TaskPrinter(PrintWriter out) {
-        this.printer = out;
+
+    public TaskPrinter(PrintWriter printer) {
+        this.printer = printer;
     }
 
     public void print(String task) {

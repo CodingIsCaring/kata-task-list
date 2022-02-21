@@ -10,29 +10,29 @@ public final class TaskList implements Runnable {
     private static final String QUIT = "quit";
 
     private final Map<String, List<Task>> tasks = new LinkedHashMap<>();
-    private TaskReader taskReader;
-    private TaskPrinter out;
+    private TaskReader reader;
+    private TaskPrinter printer;
 
     private long lastId = 0;
 
     public static void main(String[] args) {
-        TaskReader reader = new TaskReader((PipedInputStream) System.in);
-        TaskPrinter printer = new TaskPrinter(new PrintWriter(System.out));
-        new TaskList(reader, printer).run();
+        TaskReader taskReader = new TaskReader((PipedInputStream) System.in);
+        TaskPrinter taskPrinter = new TaskPrinter(new PrintWriter(System.out));
+        new TaskList(taskReader, taskPrinter).run();
     }
 
     public TaskList(TaskReader taskReader, TaskPrinter taskPrinter) {
-        this.taskReader = taskReader;
-        this.out = taskPrinter;
+        this.reader = taskReader;
+        this.printer = taskPrinter;
     }
 
     public void run() {
         while (true) {
-            out.print("> ");
-            out.flush();
+            printer.print("> ");
+            printer.flush();
             String command;
             try {
-                command = taskReader.readLine();
+                command = reader.readLine();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -70,11 +70,11 @@ public final class TaskList implements Runnable {
 
     private void show() {
         for (Map.Entry<String, List<Task>> project : tasks.entrySet()) {
-            out.println(project.getKey());
+            printer.println(project.getKey());
             for (Task task : project.getValue()) {
-                out.printf("    [%c] %d: %s%n", (task.isDone() ? 'x' : ' '), task.getId(), task.getDescription());
+                printer.printf("    [%c] %d: %s%n", (task.isDone() ? 'x' : ' '), task.getId(), task.getDescription());
             }
-            out.println();
+            printer.println();
         }
     }
 
@@ -96,8 +96,8 @@ public final class TaskList implements Runnable {
     private void addTask(String project, String description) {
         List<Task> projectTasks = tasks.get(project);
         if (projectTasks == null) {
-            out.printf("Could not find a project with the name \"%s\".", project);
-            out.println();
+            printer.printf("Could not find a project with the name \"%s\".", project);
+            printer.println();
             return;
         }
         projectTasks.add(new Task(nextId(), description));
@@ -121,23 +121,23 @@ public final class TaskList implements Runnable {
                 }
             }
         }
-        out.printf("Could not find a task with an ID of %d.", id);
-        out.println();
+        printer.printf("Could not find a task with an ID of %d.", id);
+        printer.println();
     }
 
     private void help() {
-        out.println("Commands:");
-        out.println("  show");
-        out.println("  add project <project name>");
-        out.println("  add task <project name> <task description>");
-        out.println("  check <task ID>");
-        out.println("  uncheck <task ID>");
-        out.println();
+        printer.println("Commands:");
+        printer.println("  show");
+        printer.println("  add project <project name>");
+        printer.println("  add task <project name> <task description>");
+        printer.println("  check <task ID>");
+        printer.println("  uncheck <task ID>");
+        printer.println();
     }
 
     private void error(String command) {
-        out.printf("I don't know what the command \"%s\" is.", command);
-        out.println();
+        printer.printf("I don't know what the command \"%s\" is.", command);
+        printer.println();
     }
 
     private long nextId() {
